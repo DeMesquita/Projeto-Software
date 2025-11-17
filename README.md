@@ -1,9 +1,5 @@
 # 🗺️ Documentação da Arquitetura C4 do Sistema Fale Conosco
 
-Esta documentação utiliza o **Modelo C4** para descrever a arquitetura do sistema **Fale Conosco**, que visa facilitar a gestão e a realização de atendimentos ao público. Os diagramas são gerados usando a notação **PlantUML**.
-
----
-
 ## 1. Nível de Contexto: Canal de Atendimento Fale Conosco
 
 ### Descrição do Diagrama
