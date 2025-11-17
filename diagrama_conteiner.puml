@@ -1,0 +1,54 @@
+@startuml FaleConosco - Contêineres
+
+title C4 - Diagrama de Contêineres - Fale Conosco
+
+!include <C4/C4_Container.puml>
+
+
+' Pessoas
+Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
+Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade e desempenho.")
+Person(admin, "Administrador", "Equipe técnica para gerenciamento global.")
+
+' Sistema Externo
+System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.") 
+
+
+System_Boundary(faleconosco, "Sistema Fale Conosco") {
+
+    ' Contêineres Frontend
+    ' Ambas as aplicações Web usam React
+    Container(portal_solic, "Portal do Solicitante", "Aplicação Web (React)", "Interface pública para iniciar/solicitar atendimentos.")
+    Container(app_backoffice, "Aplicação Backoffice", "Aplicação Web (React)", "Interface para Atendentes prestarem atendimento, além de Gestores e Administradores realizarem a gestão dos atendimentos e configurações da plataforma.")
+
+    ' Contêiner Backend
+    ' A API usa Java
+    Container(api, "API de Serviços", "Serviço Web (Java)", "Expõe a lógica de negócio, gerencia filas e comunica com sistemas externos.")
+    
+    ' Contêiner de Dados (mantido)
+    ContainerDb(db, "Base de Dados", "PostgreSQL", "Armazena dados de atendimentos, usuários e configurações.")
+}
+
+
+' Relacionamentos Internos
+
+Rel(portal_solic, api, "Lê e Escreve Dados", "HTTPS/JSON")
+Rel(app_backoffice, api, "Lê e Escreve Dados", "HTTPS/JSON")
+Rel_U(api, db, "Lê e Escreve Dados", "JDBC")
+
+
+' Relacionamentos com o Contexto
+
+' Usuários e Frontends
+Rel(solicitante, portal_solic, "Usa", "Interface Web")
+Rel(atendente, app_backoffice, "Usa", "Interface Web")
+Rel(gestor, app_backoffice, "Usa", "Interface Web")
+Rel(admin, app_backoffice, "Usa", "Interface Web")
+
+' API e Sistema de Autenticação
+Rel_R(api, auth_system, "Autenticação e Consulta de Perfis", "HTTPS")
+
+
+SHOW_LEGEND()
+@enduml

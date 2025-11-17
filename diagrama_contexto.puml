@@ -1,0 +1,26 @@
+@startumlCanalAtendimentoFaleConosco
+title C4 - Diagrama de Contexto - Canal de Atendimento Fale Conosco
+!include <C4/C4_Context.puml>
+
+' Sistema
+System(faleconosco, "Fale Conosco", "Plataforma para gestão e realização de atendimento ao público.")
+' Sistema Externo
+System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.") 
+
+' Pessoas
+Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
+Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade, configurações e desempenho da equipe.")
+Person(admin, "Administrador", "Equipe técnica responsável pela manutenção e gerenciamento global do sistema.")
+
+' Relacionamentos
+Rel(solicitante, faleconosco, "Solicita e Acompanha", "Interface Web")
+Rel(atendente, faleconosco, "Realiza Atendimentos e Controla fila de Atendimentos", "Interface Web")
+Rel(gestor, faleconosco, "Configura Unidades e Visualiza Estatísticas", "Interface Web")
+Rel(admin, faleconosco, "Gerencia Configurações Globais e Manutenção", "Interface Web")
+
+' Relacionamentos com Sistemas Externos
+Rel(faleconosco, auth_system, "Autenticação e consulta de perfis de usuário", "HTTPS") 
+
+
+@enduml
