@@ -1,69 +1,107 @@
-@startuml
+@startuml FaleConosco - Componentes
 
 title C4 - Nível de Componentes - API de Serviços Fale Conosco
 
-package "API de Serviços (Aplicação Java REST)" {
+' Usa a biblioteca C4 já embutida no PlantUML
+!include <C4/C4_Component.puml>
 
-  package "Camada de Controllers" {
-    [AtendimentoController] <<REST Controller>>
-    [FilaController] <<REST Controller>>
-    [UnidadeController] <<REST Controller>>
-    [UsuarioController] <<REST Controller>>
-    [EstatisticasController] <<REST Controller>>
-    [ConfiguracaoController] <<REST Controller>>
-  }
+' -------------------------------------------------------------------
+' Atores e sistemas externos (para manter coerência com o container)
+' -------------------------------------------------------------------
+Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
+Person(atendente,  "Atendente",  "Colaborador responsável por interagir e concluir os atendimentos.")
+Person(gestor,     "Gestor",     "Supervisor responsável pela unidade e desempenho.")
+Person(admin,      "Administrador", "Equipe técnica para gerenciamento global.")
 
-  package "Camada de Services (Regras de Negócio)" {
-    [AtendimentoService] <<Service>>
-    [FilaService] <<Service>>
-    [UnidadeService] <<Service>>
-    [UsuarioService] <<Service>>
-    [EstatisticasService] <<Service>>
-    [ConfiguracaoService] <<Service>>
-    [AuthClient] <<HTTP Client>>
-    [ChatGateway] <<WebSocket Gateway>>
-  }
+System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.")
 
-  package "Camada de Repositórios (Persistência)" {
-    [AtendimentoRepository] <<Repository>>
-    [UsuarioRepository] <<Repository>>
-    [UnidadeRepository] <<Repository>>
-    [EstatisticasRepository] <<Repository>>
-    [ConfiguracaoRepository] <<Repository>>
-  }
+' Containers já existentes no nível de contêineres
+Container(portal_solic,   "Portal do Solicitante", "Aplicação Web (React)", "Interface pública para iniciar/solicitar atendimentos.")
+Container(app_backoffice, "Aplicação Backoffice",  "Aplicação Web (React)", "Interface para Atendentes, Gestores e Administradores gerenciarem atendimentos e configurações.")
+ContainerDb(db,           "Base de Dados", "PostgreSQL", "Armazena dados de atendimentos, usuários e configurações.")
+
+' -------------------------------------------------------------------
+' Zoom no container da API de Serviços (nível de componentes)
+' -------------------------------------------------------------------
+System_Boundary(faleconosco, "Sistema Fale Conosco") {
+
+    Container_Boundary(api, "API de Serviços", "Aplicação Java (REST)", "Expõe a lógica de negócio, gerencia filas e integrações.") {
+
+        ' Camada de Controllers (entrada HTTP)
+        Component(estatisticasController, "EstatisticasController", "REST Controller", "Exponibiliza endpoints de consulta de estatísticas.")
+        Component(configuracaoController, "ConfiguracaoController", "REST Controller", "Gerencia configurações gerais da plataforma.")
+        Component(filaController,         "FilaController", "REST Controller", "Gerencia filas de atendimento.")
+        Component(usuarioController,      "UsuarioController", "REST Controller", "Gerencia usuários e autenticação na aplicação.")
+        Component(unidadeController,      "UnidadeController", "REST Controller", "Gerencia unidades de atendimento.")
+        Component(atendimentoController,  "AtendimentoController", "REST Controller", "Opera o ciclo de vida dos atendimentos.")
+
+        ' Camada de Services (regras de negócio)
+        Component(estatisticasService, "EstatisticasService", "Service", "Regra de negócio para cálculo e consolidação de estatísticas.")
+        Component(configuracaoService, "ConfiguracaoService", "Service", "Regras para gestão de parâmetros e configurações.")
+        Component(filaService,         "FilaService", "Service", "Regras para organização e priorização da fila de atendimentos.")
+        Component(usuarioService,      "UsuarioService", "Service", "Regras de negócio para gestão de usuários.")
+        Component(unidadeService,      "UnidadeService", "Service", "Regras de negócio para unidades de atendimento.")
+        Component(atendimentoService,  "AtendimentoService", "Service", "Regras de negócio do fluxo de atendimento.")
+        Component(authClient,          "AuthClient", "HTTP Client", "Cliente HTTP para integração com o Sistema de Autenticação.")
+        Component(chatGateway,         "ChatGateway", "WebSocket Gateway", "Gerencia comunicação em tempo real (chat) dos atendimentos.")
+
+        ' Camada de Repositórios (persistência)
+        ComponentDb(estatisticasRepository, "EstatisticasRepository", "Repository", "Acesso aos dados de estatísticas.")
+        ComponentDb(configuracaoRepository, "ConfiguracaoRepository", "Repository", "Acesso às configurações persistidas.")
+        ComponentDb(atendimentoRepository,  "AtendimentoRepository", "Repository", "Acesso aos dados de atendimentos.")
+        ComponentDb(usuarioRepository,      "UsuarioRepository", "Repository", "Acesso aos dados de usuários.")
+        ComponentDb(unidadeRepository,      "UnidadeRepository", "Repository", "Acesso aos dados de unidades.")
+    }
 }
 
-' ---- Relações principais ----
+' -------------------------------------------------------------------
+' Relações entre containers e componentes
+' -------------------------------------------------------------------
+
+' Usuários -> containers de interface
+Rel(solicitante, portal_solic, "Solicita e acompanha atendimentos", "Interface Web")
+Rel(atendente,  app_backoffice, "Realiza atendimentos", "Interface Web")
+Rel(gestor,     app_backoffice, "Configura unidades e visualiza estatísticas", "Interface Web")
+Rel(admin,      app_backoffice, "Gerencia configurações globais", "Interface Web")
+
+' Portais chamando controllers da API
+Rel(portal_solic,   atendimentoController, "HTTP/JSON")
+Rel(portal_solic,   usuarioController,     "HTTP/JSON (autenticação do solicitante)")
+Rel(app_backoffice, atendimentoController, "HTTP/JSON")
+Rel(app_backoffice, filaController,        "HTTP/JSON")
+Rel(app_backoffice, unidadeController,     "HTTP/JSON")
+Rel(app_backoffice, estatisticasController,"HTTP/JSON")
+Rel(app_backoffice, configuracaoController,"HTTP/JSON")
 
 ' Controllers -> Services
-[AtendimentoController] --> [AtendimentoService]
-[FilaController] --> [FilaService]
-[UnidadeController] --> [UnidadeService]
-[UsuarioController] --> [UsuarioService]
-[EstatisticasController] --> [EstatisticasService]
-[ConfiguracaoController] --> [ConfiguracaoService]
+Rel(atendimentoController,  atendimentoService, "Invoca regras de atendimento")
+Rel(filaController,         filaService,        "Gerencia fila")
+Rel(unidadeController,      unidadeService,     "Invoca regras de unidades")
+Rel(usuarioController,      usuarioService,     "Invoca regras de usuários")
+Rel(estatisticasController, estatisticasService,"Consulta estatísticas")
+Rel(configuracaoController, configuracaoService,"Gerencia configurações")
 
 ' Services -> Repositórios
-[AtendimentoService] --> [AtendimentoRepository]
-[FilaService] --> [AtendimentoRepository]
-[UnidadeService] --> [UnidadeRepository]
-[UsuarioService] --> [UsuarioRepository]
-[EstatisticasService] --> [EstatisticasRepository]
-[ConfiguracaoService] --> [ConfiguracaoRepository]
+Rel(atendimentoService,  atendimentoRepository,  "CRUD de atendimentos")
+Rel(filaService,         atendimentoRepository,  "Consulta fila (atendimentos pendentes)")
+Rel(unidadeService,      unidadeRepository,      "CRUD de unidades")
+Rel(usuarioService,      usuarioRepository,      "CRUD de usuários")
+Rel(estatisticasService, estatisticasRepository, "Consulta dados agregados")
+Rel(configuracaoService, configuracaoRepository, "Persiste e lê configurações")
 
-' Integração com Sistema de Autenticação
-[UsuarioService] --> [AuthClient] : consulta perfis/autenticação
+' Integração com Sistema de Autenticação via AuthClient
+Rel(usuarioService, authClient, "Consulta perfis/autenticação", "HTTPS")
+Rel(authClient, auth_system,   "Chamada a API de autenticação", "HTTPS")
 
-' Chat em tempo real
-[ChatGateway] --> [AtendimentoService] : envia eventos de chat
+' Chat em tempo real ligado ao fluxo de atendimento
+Rel(chatGateway, atendimentoService, "Envia eventos de chat", "WebSocket")
 
-' Repositórios -> Banco de Dados (representado como um componente lógico)
-database "Base de Dados\n(PostgreSQL)" as DB
+' Repositórios -> Base de Dados
+Rel(estatisticasRepository, db, "JDBC")
+Rel(configuracaoRepository, db, "JDBC")
+Rel(atendimentoRepository,  db, "JDBC")
+Rel(usuarioRepository,      db, "JDBC")
+Rel(unidadeRepository,      db, "JDBC")
 
-[AtendimentoRepository] --> DB
-[UsuarioRepository] --> DB
-[UnidadeRepository] --> DB
-[EstatisticasRepository] --> DB
-[ConfiguracaoRepository] --> DB
-
+SHOW_LEGEND()
 @enduml
