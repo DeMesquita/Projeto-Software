@@ -1,4 +1,4 @@
-# Arquitetura de Alto Nível – Sistema Fale Conosco
+# Arquitetura de Alto Nível - Sistema Fale Conosco
 
 ## 1. Visão Geral do Sistema
 
@@ -31,10 +31,10 @@ Os usuários identificados no sistema são:
 
 O sistema é dividido em quatro grandes blocos:
 
-### 4.1. Portal do Solicitante (Aplicação Web – React)
+### 4.1. Portal do Solicitante (Aplicação Web - React)
 Interface pública utilizada pelos solicitantes para abertura e consulta de atendimentos.
 
-### 4.2. Aplicação Backoffice (Aplicação Web – React)
+### 4.2. Aplicação Backoffice (Aplicação Web - React)
 Interface destinada a Atendentes, Gestores e Administradores para:
 
 - realizar atendimentos,
@@ -54,7 +54,7 @@ Armazena informações de:
 - configurações,
 - estatísticas.
 
-## 5. Diagrama de Alto Nível (C4 – Nível de Contêineres)
+## 5. Diagrama de Alto Nível (C4 - Nível de Contêineres)
 
 O diagrama de contêineres descreve como cada aplicação interage com a API e com o sistema de autenticação.  
 Ele apresenta:
@@ -64,8 +64,6 @@ Ele apresenta:
 - Base de Dados,
 - Sistema de Autenticação,
 - Atores externos.
-
-O modelo segue o padrão **C4-Model**, garantindo padronização e clareza arquitetural.
 
 ## 6. Conclusão
 
