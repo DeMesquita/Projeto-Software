@@ -1,1 +1,117 @@
+@startuml FaleConosco - Componentes
 
+title C4 - Diagrama de Componentes - Fale Conosco
+
+!include <C4/C4_Component.puml>
+
+' Pessoas (apenas para contexto, como no diagrama de contêineres)
+Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
+Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade e desempenho.")
+Person(admin, "Administrador", "Equipe técnica para gerenciamento global.")
+
+' Sistema Externo e outros contêineres (mesmos nomes usados no diagrama de contêineres)
+System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.")
+Container_Web(portal_solic, "Portal do Solicitante", "Aplicação Web (React)", "Interface pública para iniciar/solicitar atendimentos.")
+Container_Web(app_backoffice, "Aplicação Backoffice", "Aplicação Web (React)", "Interface para Atendentes, Gestores e Administradores.")
+ContainerDb(db, "Base de Dados", "PostgreSQL", "Armazena dados de atendimentos, usuários e configurações.")
+
+' ----------------------------------------------------------------------
+' API DE SERVIÇOS – DESDOBRAMENTO EM COMPONENTES
+' ----------------------------------------------------------------------
+
+Container_Boundary(api, "API de Serviços", "Aplicação Java (REST)", "Expõe a lógica de negócio e integra com o banco e sistemas externos.") {
+
+  ' Camada de Controllers (entrada HTTP)
+  Component(atendimentoController, "AtendimentoController", "REST Controller",
+            "Exposição de endpoints para criar, acompanhar e encerrar atendimentos.")
+  Component(filaController, "FilaController", "REST Controller",
+            "Exposição de endpoints para operar a fila de atendimento (próximo, prioridade etc.).")
+  Component(unidadeController, "UnidadeController", "REST Controller",
+            "Exposição de endpoints para gerenciar unidades de atendimento.")
+  Component(usuarioController, "UsuarioController", "REST Controller",
+            "Exposição de endpoints para consultar e gerenciar usuários/perfis.")
+  Component(estatisticasController, "EstatisticasController", "REST Controller",
+            "Exposição de endpoints para métricas e relatórios.")
+  Component(configController, "ConfiguracaoController", "REST Controller",
+            "Exposição de endpoints para respostas rápidas, avisos internos e outras configurações.")
+
+  ' Camada de Services (regras de negócio)
+  Component(atendimentoService, "AtendimentoService", "Service",
+            "Regras de negócio de criação, atendimento, avaliação e encerramento de atendimentos.")
+  Component(filaService, "FilaService", "Service",
+            "Regras de negócio da fila: ordenação, priorização e tempo de espera.")
+  Component(unidadeService, "UnidadeService", "Service",
+            "Regras de negócio de unidades, horários de funcionamento e parâmetros da unidade.")
+  Component(usuarioService, "UsuarioService", "Service",
+            "Regras de negócio sobre usuários, perfis e acessos.")
+  Component(estatisticasService, "EstatisticasService", "Service",
+            "Cálculo e consolidação de métricas e estatísticas de atendimento.")
+  Component(configService, "ConfiguracaoService", "Service",
+            "Gerenciamento de configurações globais, avisos internos e respostas rápidas.")
+  Component(authClient, "AuthClient", "Cliente HTTP",
+            "Integração com o Sistema de Autenticação corporativo (consulta de perfis/autenticação).")
+  Component(chatGateway, "ChatGateway", "Gateway de Chat (WebSocket)",
+            "Canal de comunicação em tempo real entre Solicitantes e Atendentes.")
+
+  ' Camada de Repositórios (acesso a dados)
+  ComponentDb(atendimentoRepo, "AtendimentoRepository", "JPA Repository",
+              "Leitura e escrita de atendimentos e anotações.")
+  ComponentDb(usuarioRepo, "UsuarioRepository", "JPA Repository",
+              "Leitura e escrita de usuários e seus perfis.")
+  ComponentDb(unidadeRepo, "UnidadeRepository", "JPA Repository",
+              "Leitura e escrita de unidades de atendimento.")
+  ComponentDb(estatisticasRepo, "EstatisticasRepository", "JPA Repository",
+              "Consultas agregadas para métricas históricas.")
+  ComponentDb(configRepo, "ConfiguracaoRepository", "JPA Repository",
+              "Leitura e escrita de configurações globais, avisos e respostas rápidas.")
+}
+
+' ----------------------------------------------------------------------
+' RELACIONAMENTOS (seguindo o mesmo padrão do diagrama de contêineres)
+' ----------------------------------------------------------------------
+
+' Frontends -> Controllers
+Rel(portal_solic, atendimentoController, "Cria e acompanha atendimentos", "HTTPS/JSON")
+Rel(portal_solic, filaController, "Consulta posição na fila", "HTTPS/JSON")
+Rel(portal_solic, usuarioController, "Consulta/atualiza dados básicos", "HTTPS/JSON")
+
+Rel(app_backoffice, atendimentoController, "Gerencia atendimentos", "HTTPS/JSON")
+Rel(app_backoffice, filaController, "Opera fila de atendimentos", "HTTPS/JSON")
+Rel(app_backoffice, unidadeController, "Configura unidades", "HTTPS/JSON")
+Rel(app_backoffice, estatisticasController, "Consulta métricas e relatórios", "HTTPS/JSON")
+Rel(app_backoffice, configController, "Gerencia respostas rápidas e avisos", "HTTPS/JSON")
+
+' Controllers -> Services
+Rel(atendimentoController, atendimentoService, "Delegação de regras de atendimento")
+Rel(filaController, filaService, "Delegação de regras da fila")
+Rel(unidadeController, unidadeService, "Delegação de regras de unidade")
+Rel(usuarioController, usuarioService, "Delegação de regras de usuários/perfis")
+Rel(estatisticasController, estatisticasService, "Solicita dados consolidados")
+Rel(configController, configService, "Gerencia parâmetros/configurações")
+
+' Services -> Repositórios
+Rel(atendimentoService, atendimentoRepo, "Lê/Escreve atendimentos", "JDBC/JPA")
+Rel(filaService, atendimentoRepo, "Consulta fila de atendimento", "JDBC/JPA")
+Rel(unidadeService, unidadeRepo, "Lê/Escreve unidades", "JDBC/JPA")
+Rel(usuarioService, usuarioRepo, "Lê/Escreve usuários", "JDBC/JPA")
+Rel(estatisticasService, estatisticasRepo, "Consulta dados históricos", "JDBC/JPA")
+Rel(configService, configRepo, "Lê/Escreve configurações", "JDBC/JPA")
+
+' Integração com Sistema de Autenticação
+Rel(usuarioService, authClient, "Consulta autenticação e perfis", "HTTPS")
+Rel(authClient, auth_system, "Chama API do Sistema de Autenticação", "HTTPS")
+
+' Chat em tempo real
+Rel(chatGateway, solicitante, "Troca mensagens em tempo real", "WebSocket")
+Rel(chatGateway, atendente, "Troca mensagens em tempo real", "WebSocket")
+
+' Repositórios -> Banco
+Rel(atendimentoRepo, db, "Persiste atendimentos", "JDBC")
+Rel(unidadeRepo, db, "Persiste unidades", "JDBC")
+Rel(usuarioRepo, db, "Persiste usuários", "JDBC")
+Rel(estatisticasRepo, db, "Consulta dados agregados", "JDBC")
+Rel(configRepo, db, "Persiste configurações", "JDBC")
+
+SHOW_LEGEND()
+@enduml
