@@ -11,7 +11,7 @@ O **Diagrama de Contexto** do sistema **Fale Conosco**.
     * **Solicitantes:** Buscam e solicitam atendimento.
     * **Atendentes:** Realizam atendimentos e controlam a fila.
     * **Gestores:** Configuram unidades de atendimento e visualizam estatísticas.
-    * **Administradores:** Realizam gerenciamento global e manutenção técnica.
+    * **Administradores:** Realizam operação e manutenção técnica.
 * **Sistemas Externos:** O sistema depende do **Sistema de Autenticação** corporativo, que gerencia as identidades e perfis dos usuários. A comunicação para autenticação é feita via **HTTPS**.
 Trabalho Final/out/diagrama_conteiner
 ![Diagrama de Contexto](Trabalho%20Final/out/diagrama_contexto/diagrama_contexto.png)
@@ -25,3 +25,9 @@ Trabalho Final/out/diagrama_conteiner
 3.  **API $\to$ Base de Dados:** A **API de Serviços** acessa e manipula os dados na **Base de Dados (PostgreSQL)**, usando **JDBC**.
 4.  **API $\to$ Sistema Externo:** A **API de Serviços** consulta o **Sistema de Autenticação** externo (via **HTTPS**) para validar credenciais e buscar perfis.
 ![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_conteiner/diagrama_conteiner.png)
+
+## 3. Nível de Componentes: Fale Conosco
+![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_components/diagrama_components.png)
+
+## 4. Nível de Código: Fale Conosco
+![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_codigo/diagrama_código.png)
