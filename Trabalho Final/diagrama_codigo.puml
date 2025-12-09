@@ -1,0 +1,134 @@
+@startuml
+title C4 - Nível 4 (Código) - Módulo de Atendimento
+
+' Estilo geral aproximando dos C4 já usados
+skinparam backgroundColor white
+
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  RoundCorner 15
+  FontColor #0D47A1
+  FontSize 14
+}
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1976D2
+  RoundCorner 10
+  FontColor #0D47A1
+}
+
+skinparam stereotypeCBackgroundColor #E3F2FD
+skinparam stereotypeCBorderColor #1565C0
+
+skinparam ArrowColor #424242
+
+' ------------------------------------------------------------------
+' Boundary geral da API de Serviços (zoom no módulo de Atendimento)
+' ------------------------------------------------------------------
+package "API de Serviços - Módulo de Atendimento" {
+
+  ' ====================== Camada de Controller ======================
+  package "Camada de Controller" {
+
+    class AtendimentoController <<Controller>> {
+      +criarAtendimento(dto: AtendimentoDTO): AtendimentoResponse
+      +listarAtendimentos(filtro: FiltroAtendimentoDTO): List<AtendimentoResumoDTO>
+      +encerrarAtendimento(id: Long, avaliacao: AvaliacaoDTO): void
+    }
+  }
+
+  ' ====================== Camada de Service =========================
+  package "Camada de Service" {
+
+    class AtendimentoService <<Service>> {
+      +criarAtendimento(dto: AtendimentoDTO, usuario: Usuario): Atendimento
+      +listarAtendimentos(filtro: FiltroAtendimentoDTO, usuario: Usuario): List<Atendimento>
+      +encerrarAtendimento(id: Long, avaliacao: AvaliacaoDTO): void
+    }
+
+    class FilaService <<Service>> {
+      +proximoAtendimento(unidadeId: Long): Atendimento
+      +reordenarFila(unidadeId: Long): void
+    }
+  }
+
+  ' ====================== Camada de Repository ======================
+  package "Camada de Repository" {
+
+    interface AtendimentoRepository <<Repository>> {
+      +save(atendimento: Atendimento): Atendimento
+      +findById(id: Long): Atendimento
+      +findPendentesPorUnidade(unidadeId: Long): List<Atendimento>
+    }
+  }
+
+  ' ====================== Modelo de Domínio =========================
+  package "Modelo de Domínio" {
+
+    class Atendimento <<Entity>> {
+      -id: Long
+      -protocolo: String
+      -status: StatusAtendimento
+      -prioridade: Prioridade
+      -descricao: String
+      -dataAbertura: LocalDateTime
+      -dataEncerramento: LocalDateTime
+    }
+
+    class Usuario <<Entity>> {
+      -id: Long
+      -nome: String
+      -email: String
+      -perfil: PerfilUsuario
+    }
+
+    class Unidade <<Entity>> {
+      -id: Long
+      -nome: String
+      -codigo: String
+    }
+
+    enum StatusAtendimento {
+      ABERTO
+      EM_ANDAMENTO
+      ENCERRADO
+    }
+
+    enum Prioridade {
+      BAIXA
+      MEDIA
+      ALTA
+    }
+
+    enum PerfilUsuario {
+      SOLICITANTE
+      ATENDENTE
+      GESTOR
+      ADMINISTRADOR
+    }
+  }
+}
+
+' ------------------------------------------------------------------
+' RELAÇÕES ENTRE CAMADAS E DOMÍNIO (coerentes com o C4 de componentes)
+' ------------------------------------------------------------------
+
+' Controller -> Services
+AtendimentoController --> AtendimentoService : usa
+AtendimentoService --> FilaService          : organiza fila
+
+' Services -> Repository
+AtendimentoService --> AtendimentoRepository : persiste / consulta
+
+' Domínio
+Atendimento "1" o-- "1" Usuario : solicitante
+Atendimento "0..1" o-- "0..1" Usuario : atendenteResponsavel
+Atendimento "1" o-- "1" Unidade : unidade
+Atendimento --> StatusAtendimento
+Atendimento --> Prioridade
+Usuario --> PerfilUsuario
+
+@enduml
