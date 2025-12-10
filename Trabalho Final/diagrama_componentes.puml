@@ -1,105 +1,110 @@
-@startuml FaleConosco - Componentes
-
+@startuml
 title C4 - Nível de Componentes - API de Serviços Fale Conosco
 
-' Usa a biblioteca C4 já embutida no PlantUML
-!include <C4/C4_Component.puml>
+skinparam backgroundColor white
 
-' Pessoas
-Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
-Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
-Person(gestor, "Gestor", "Supervisor responsável pela unidade e gestão da equipe.")
-Person(admin, "Administrador", "Equipe técnica para operação e manutenção do sistema.")
-
-System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.")
-
-' Containers já existentes no nível de contêineres
-Container(portal_solic,   "Portal do Solicitante", "Aplicação Web (React)", "Interface pública para iniciar/solicitar atendimentos.")
-Container(app_backoffice, "Aplicação Backoffice",  "Aplicação Web (React)", "Interface para Atendentes, Gestores e Administradores gerenciarem atendimentos e configurações.")
-ContainerDb(db,           "Base de Dados", "PostgreSQL", "Armazena dados de atendimentos, usuários e configurações.")
-
-' -------------------------------------------------------------------
-' Zoom no container da API de Serviços (nível de componentes)
-' -------------------------------------------------------------------
-System_Boundary(faleconosco, "Sistema Fale Conosco") {
-
-    Container_Boundary(api, "API de Serviços", "Aplicação Java (REST)", "Expõe a lógica de negócio, gerencia filas e integrações.") {
-
-        ' Camada de Controllers (entrada HTTP)
-        Component(estatisticasController, "EstatisticasController", "REST Controller", "Exponibiliza endpoints de consulta de estatísticas.")
-        Component(configuracaoController, "ConfiguracaoController", "REST Controller", "Gerencia configurações gerais da plataforma.")
-        Component(filaController,         "FilaController", "REST Controller", "Gerencia filas de atendimento.")
-        Component(usuarioController,      "UsuarioController", "REST Controller", "Gerencia usuários e autenticação na aplicação.")
-        Component(unidadeController,      "UnidadeController", "REST Controller", "Gerencia unidades de atendimento.")
-        Component(atendimentoController,  "AtendimentoController", "REST Controller", "Opera o ciclo de vida dos atendimentos.")
-
-        ' Camada de Services (regras de negócio)
-        Component(estatisticasService, "EstatisticasService", "Service", "Regra de negócio para cálculo e consolidação de estatísticas.")
-        Component(configuracaoService, "ConfiguracaoService", "Service", "Regras para gestão de parâmetros e configurações.")
-        Component(filaService,         "FilaService", "Service", "Regras para organização e priorização da fila de atendimentos.")
-        Component(usuarioService,      "UsuarioService", "Service", "Regras de negócio para gestão de usuários.")
-        Component(unidadeService,      "UnidadeService", "Service", "Regras de negócio para unidades de atendimento.")
-        Component(atendimentoService,  "AtendimentoService", "Service", "Regras de negócio do fluxo de atendimento.")
-        Component(authClient,          "AuthClient", "HTTP Client", "Cliente HTTP para integração com o Sistema de Autenticação.")
-        Component(chatGateway,         "ChatGateway", "WebSocket Gateway", "Gerencia comunicação em tempo real (chat) dos atendimentos.")
-
-        ' Camada de Repositórios (persistência)
-        ComponentDb(estatisticasRepository, "EstatisticasRepository", "Repository", "Acesso aos dados de estatísticas.")
-        ComponentDb(configuracaoRepository, "ConfiguracaoRepository", "Repository", "Acesso às configurações persistidas.")
-        ComponentDb(atendimentoRepository,  "AtendimentoRepository", "Repository", "Acesso aos dados de atendimentos.")
-        ComponentDb(usuarioRepository,      "UsuarioRepository", "Repository", "Acesso aos dados de usuários.")
-        ComponentDb(unidadeRepository,      "UnidadeRepository", "Repository", "Acesso aos dados de unidades.")
-    }
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  RoundCorner 15
+  FontColor #0D47A1
+  FontSize 14
 }
 
-' -------------------------------------------------------------------
-' Relações entre containers e componentes
-' -------------------------------------------------------------------
+skinparam component {
+  BackgroundColor #1976D2
+  BorderColor #0D47A1
+  FontColor white
+  RoundCorner 10
+}
 
-' Usuários -> containers de interface
-Rel(solicitante, portal_solic, "Solicita e acompanha atendimentos", "Interface Web")
-Rel(atendente,  app_backoffice, "Realiza atendimentos", "Interface Web")
-Rel(gestor,     app_backoffice, "Configura unidades e visualiza estatísticas", "Interface Web")
-Rel(admin,      app_backoffice, "Realiza operação e manutenção técnica", "Interface Web")
+skinparam ArrowColor #424242
 
-' Portais chamando controllers da API
-Rel(portal_solic,   atendimentoController, "HTTP/JSON")
-Rel(portal_solic,   usuarioController,     "HTTP/JSON (autenticação do solicitante)")
-Rel(app_backoffice, atendimentoController, "HTTP/JSON")
-Rel(app_backoffice, filaController,        "HTTP/JSON")
-Rel(app_backoffice, unidadeController,     "HTTP/JSON")
-Rel(app_backoffice, estatisticasController,"HTTP/JSON")
-Rel(app_backoffice, configuracaoController,"HTTP/JSON")
+' ----------------------------------------------------------
+' Frontends e sistemas externos
+' ----------------------------------------------------------
+rectangle "Portal do Solicitante\n(React Web)" as portal_solic #EEEEEE
+rectangle "Aplicação Backoffice\n(React Web)" as backoffice    #EEEEEE
+rectangle "Sistema de Autenticação" as auth_system             #DDDDDD
+database  "Base de Dados\n(PostgreSQL)" as db                  #FFFFFF
 
-' Controllers -> Services
-Rel(atendimentoController,  atendimentoService, "Invoca regras de atendimento")
-Rel(filaController,         filaService,        "Gerencia fila")
-Rel(unidadeController,      unidadeService,     "Invoca regras de unidades")
-Rel(usuarioController,      usuarioService,     "Invoca regras de usuários")
-Rel(estatisticasController, estatisticasService,"Consulta estatísticas")
-Rel(configuracaoController, configuracaoService,"Gerencia configurações")
+' ----------------------------------------------------------
+' Boundary da API de Serviços
+' ----------------------------------------------------------
+package "API de Serviços\n(Aplicação Java REST)" {
 
-' Services -> Repositórios
-Rel(atendimentoService,  atendimentoRepository,  "CRUD de atendimentos")
-Rel(filaService,         atendimentoRepository,  "Consulta fila (atendimentos pendentes)")
-Rel(unidadeService,      unidadeRepository,      "CRUD de unidades")
-Rel(usuarioService,      usuarioRepository,      "CRUD de usuários")
-Rel(estatisticasService, estatisticasRepository, "Consulta dados agregados")
-Rel(configuracaoService, configuracaoRepository, "Persiste e lê configurações")
+  ' ---------------- Camada de Controllers -----------------
+  package "Camada de Controllers" {
 
-' Integração com Sistema de Autenticação via AuthClient
-Rel(usuarioService, authClient, "Consulta perfis/autenticação", "HTTPS")
-Rel(authClient, auth_system,   "Chamada a API de autenticação", "HTTPS")
+    component "UsuarioController\n<<REST Controller>>"        as UsuarioController
+    component "EstatisticasController\n<<REST Controller>>"   as EstatisticasController
+    component "FilaController\n<<REST Controller>>"           as FilaController
+    component "UnidadeController\n<<REST Controller>>"        as UnidadeController
+    component "AtendimentoController\n<<REST Controller>>"    as AtendimentoController
+    component "ChatGateway\n<<WebSocket Gateway>>"            as ChatGateway
+  }
 
-' Chat em tempo real ligado ao fluxo de atendimento
-Rel(chatGateway, atendimentoService, "Envia eventos de chat", "WebSocket")
+  ' ---------------- Camada de Services --------------------
+  package "Camada de Services\n(Regras de negócio)" {
 
-' Repositórios -> Base de Dados
-Rel(estatisticasRepository, db, "JDBC")
-Rel(configuracaoRepository, db, "JDBC")
-Rel(atendimentoRepository,  db, "JDBC")
-Rel(usuarioRepository,      db, "JDBC")
-Rel(unidadeRepository,      db, "JDBC")
+    component "UsuarioService\n<<Service>>"        as UsuarioService
+    component "EstatisticasService\n<<Service>>"   as EstatisticasService
+    component "FilaService\n<<Service>>"           as FilaService
+    component "UnidadeService\n<<Service>>"        as UnidadeService
+    component "AtendimentoService\n<<Service>>"    as AtendimentoService
+  }
 
-SHOW_LEGEND()
+  ' ---------------- Camada de Repositórios ----------------
+  package "Camada de Repositórios\n(Persistência)" {
+
+    component "UsuarioRepository\n<<Repository>>"       as UsuarioRepository
+    component "EstatisticasRepository\n<<Repository>>"  as EstatisticasRepository
+    component "AtendimentoRepository\n<<Repository>>"   as AtendimentoRepository
+    component "UnidadeRepository\n<<Repository>>"       as UnidadeRepository
+  }
+
+  ' ---------------- Integração externa --------------------
+  component "AuthClient\n<<HTTP Client>>" as AuthClient
+}
+
+' ----------------------------------------------------------
+' Relacionamentos – frontends -> API
+' ----------------------------------------------------------
+portal_solic --> AtendimentoController  : abrir / consultar atendimento\n(HTTPS/JSON)
+portal_solic --> UsuarioController      : autenticação / dados do solicitante\n(HTTPS/JSON)
+
+backoffice   --> AtendimentoController  : gerenciar atendimentos\n(HTTPS/JSON)
+backoffice   --> FilaController         : gerenciar fila\n(HTTPS/JSON)
+backoffice   --> UnidadeController      : gerenciar unidades\n(HTTPS/JSON)
+backoffice   --> EstatisticasController : consultar estatísticas\n(HTTPS/JSON)
+backoffice   --> ChatGateway            : eventos de chat\n(WebSocket)
+
+' ----------------------------------------------------------
+' Relacionamentos – controllers -> services
+' ----------------------------------------------------------
+UsuarioController      --> UsuarioService
+EstatisticasController --> EstatisticasService
+FilaController         --> FilaService
+UnidadeController      --> UnidadeService
+AtendimentoController  --> AtendimentoService
+ChatGateway            --> AtendimentoService : envia eventos de chat
+
+' ----------------------------------------------------------
+' Relacionamentos – services -> repositories / integrações
+' ----------------------------------------------------------
+UsuarioService      --> UsuarioRepository
+EstatisticasService --> EstatisticasRepository
+AtendimentoService  --> AtendimentoRepository
+FilaService         --> AtendimentoRepository : consulta pendentes
+UnidadeService      --> UnidadeRepository
+
+AtendimentoService  --> AuthClient      : consulta perfis/autenticação\n(HTTPS)
+AuthClient          --> auth_system     : integra com sistema de autenticação\n(HTTPS)
+
+UsuarioRepository       --> db
+EstatisticasRepository  --> db
+AtendimentoRepository   --> db
+UnidadeRepository       --> db
+
 @enduml
