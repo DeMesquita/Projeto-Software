@@ -1,0 +1,78 @@
+@startuml
+title C4 - Nível de Componentes - Aplicação Backoffice
+
+skinparam backgroundColor white
+
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  RoundCorner 15
+  FontColor #0D47A1
+  FontSize 14
+}
+
+skinparam component {
+  BackgroundColor #1976D2
+  BorderColor #0D47A1
+  FontColor white
+  RoundCorner 10
+}
+
+skinparam ArrowColor #424242
+
+' ----------------------------------------------------------
+' Atores e sistemas externos
+' ----------------------------------------------------------
+actor Atendente as atendente
+actor Gestor as gestor
+actor Administrador as admin
+
+rectangle "API de Serviços\n(Java REST)" as api_servicos #EEEEEE
+rectangle "Sistema de Autenticação" as auth_system #DDDDDD
+
+' ----------------------------------------------------------
+' Boundary do Backoffice
+' ----------------------------------------------------------
+package "Aplicação Backoffice\n(Aplicação Web - React)" {
+
+  component "Interface Web Backoffice\n<<React SPA>>" as backoffice_ui
+
+  component "Módulo de Fila\n de Atendimentos\n<<Componente React>>" as mod_fila
+
+  component "Módulo de Atendimento\n<<Componente React>>" as mod_atendimento
+
+  component "Módulo de Gestão\n de Unidades\n<<Componente React>>" as mod_unidades
+
+  ' (REMOVIDO: Módulo de Configurações Globais)
+
+  component "Módulo de Dashboards\n e Métricas\n<<Componente React>>" as mod_dashboards
+
+  component "Cliente de API\n Backoffice\n<<HTTP Client>>" as backoffice_api_client
+
+  component "Cliente de Autenticação\n Backoffice\n<<HTTP Client>>" as backoffice_auth_client
+}
+
+' ----------------------------------------------------------
+' Relacionamentos
+' ----------------------------------------------------------
+
+atendente --> backoffice_ui : opera atendimentos\n(HTTPS)
+gestor    --> backoffice_ui : consulta métricas\ne gerencia unidades\n(HTTPS)
+admin     --> backoffice_ui : administra parâmetros\noperacionais e integrações\n(HTTPS)
+
+backoffice_ui --> mod_fila        : acessa fila
+backoffice_ui --> mod_atendimento : realiza atendimento
+backoffice_ui --> mod_unidades    : gerencia unidades
+backoffice_ui --> mod_dashboards  : visualiza indicadores
+backoffice_ui --> backoffice_auth_client : inicia login / troca de usuário\n(HTTPS)
+
+mod_fila        --> backoffice_api_client : consulta/atualiza fila\n(HTTPS/JSON)
+mod_atendimento --> backoffice_api_client : cria/atualiza atendimentos\n(HTTPS/JSON)
+mod_unidades    --> backoffice_api_client : gerencia unidades\n(HTTPS/JSON)
+mod_dashboards  --> backoffice_api_client : consulta métricas\nconsolidadas\n(HTTPS/JSON)
+
+backoffice_api_client   --> api_servicos   : chama endpoints REST\n(fila, atendimento, unidades, métricas)
+backoffice_auth_client  --> auth_system    : autentica usuário\ne obtém perfil\n(HTTPS)
+
+@enduml
