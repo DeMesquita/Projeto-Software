@@ -27,6 +27,73 @@ Trabalho Final/out/diagrama_conteiner
 ![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_conteiner/diagrama_conteiner.png)
 
 ## 3. Nível de Componentes: Fale Conosco
-![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_components/diagrama_components.png)
+
+### Descrição Geral
+
+O **Nível de Componentes** detalha a estrutura interna de cada contêiner do sistema Fale Conosco.  
+Enquanto o nível de contêineres descreve *o que existe*, este nível mostra *como cada parte é organizada internamente*, destacando responsabilidades, fluxos de comunicação e separação das camadas.
+
+A seguir, os três diagramas de componentes são apresentados com suas respectivas explicações.
+
+---
+
+### 3.1. Componentes da API de Serviços (Java REST)
+
+O diagrama da API de Serviços mostra a distribuição interna da aplicação Java responsável por toda a lógica de negócio, fila de atendimentos, regras operacionais e persistência de dados.
+
+A API está organizada em:
+
+- **Controllers (REST/WebSocket)** — Recebem requisições dos frontends.  
+- **Services** — Implementam regras de negócio.  
+- **Repositórios** — Realizam a persistência dos dados no PostgreSQL.  
+- **Cliente de Autenticação** — Integra com o Sistema de Autenticação corporativo.
+
+![Diagrama de Componentes – API de Serviços](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes1.png)
+
+---
+
+### 3.2. Componentes do Portal do Solicitante (Aplicação Web – React)
+
+O Portal do Solicitante é acessado pelo público externo e permite:
+
+- Abertura de atendimentos  
+- Consulta de status e detalhes  
+- Autenticação via sistema corporativo  
+
+A aplicação é organizada em:
+
+- **Interface Web (React SPA)**  
+- **Módulos de Solicitação e Consulta**  
+- **Cliente de API para comunicação com a API de Serviços**  
+- **Cliente de Autenticação via HTTPS**
+
+![Diagrama de Componentes – Portal do Solicitante](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes2.png)
+
+---
+
+### 3.3. Componentes da Aplicação Backoffice (Aplicação Web – React)
+
+A Aplicação Backoffice é utilizada por Atendentes, Gestores e Administradores.  
+Suas principais funções são:
+
+- Operação de atendimentos  
+- Consulta e atualização da fila  
+- Gerenciamento de unidades  
+- Visualização de dashboards e métricas  
+- Autenticação interna  
+
+Os principais módulos são:
+
+- **Fila de Atendimentos**  
+- **Atendimento**  
+- **Gestão de Unidades**  
+- **Dashboards e Métricas**  
+- **Cliente de API Backoffice**  
+- **Cliente de Autenticação**
+
+![Diagrama de Componentes – Aplicação Backoffice](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes3.png).
+
+---
+
 
 
