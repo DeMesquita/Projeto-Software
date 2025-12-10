@@ -1,0 +1,63 @@
+@startuml
+title C4 - Nível de Componentes - Portal do Solicitante
+
+skinparam backgroundColor white
+
+skinparam packageStyle rectangle
+skinparam package {
+  BackgroundColor #E3F2FD
+  BorderColor #90CAF9
+  RoundCorner 15
+  FontColor #0D47A1
+  FontSize 14
+}
+
+skinparam component {
+  BackgroundColor #1976D2
+  BorderColor #0D47A1
+  FontColor white
+  RoundCorner 10
+}
+
+skinparam ArrowColor #424242
+
+' ----------------------------------------------------------
+' Ator e sistemas externos
+' ----------------------------------------------------------
+actor Solicitante as solicitante
+rectangle "API de Serviços\n(Java REST)" as api_servicos #EEEEEE
+rectangle "Sistema de Autenticação" as auth_system #DDDDDD
+
+' ----------------------------------------------------------
+' Boundary do Portal
+' ----------------------------------------------------------
+package "Portal do Solicitante\n(Aplicação Web - React)" {
+
+  component "Interface Web do Portal\n<<React SPA>>" as portal_ui
+
+  component "Módulo de Solicitação\n de Atendimento\n<<Componente React>>" as mod_solicitacao
+
+  component "Módulo de Consulta\n de Atendimento\n<<Componente React>>" as mod_consulta
+
+  component "Cliente de API\n de Atendimento\n<<HTTP Client>>" as client_api
+
+  component "Cliente de Autenticação\n<<HTTP Client>>" as client_auth
+}
+
+' ----------------------------------------------------------
+' Relacionamentos
+' ----------------------------------------------------------
+
+solicitante --> portal_ui : acessa via navegador\n(HTTPS)
+
+portal_ui --> mod_solicitacao : abre atendimento
+portal_ui --> mod_consulta   : consulta atendimento
+portal_ui --> client_auth    : inicia login/logout\n(HTTPS)
+
+mod_solicitacao --> client_api : envia dados do atendimento\n(HTTPS/JSON)
+mod_consulta    --> client_api : consulta status/detalhes\n(HTTPS/JSON)
+
+client_api  --> api_servicos : chama endpoints REST\n/criar /consultar
+client_auth --> auth_system  : autentica usuário\nobtém perfil\n(HTTPS)
+
+@enduml
