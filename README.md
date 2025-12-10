@@ -29,5 +29,4 @@ Trabalho Final/out/diagrama_conteiner
 ## 3. Nível de Componentes: Fale Conosco
 ![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_components/diagrama_components.png)
 
-## 4. Nível de Código: Fale Conosco
-![Diagrama de Contêiner](Trabalho%20Final/out/diagrama_codigo/diagrama_código.png)
+
