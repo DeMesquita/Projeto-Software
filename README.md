@@ -39,7 +39,7 @@ A seguir, os três diagramas de componentes são apresentados com suas respectiv
 
 ### 3.1. Componentes da API de Serviços (Java REST)
 
-O diagrama da API de Serviços mostra a distribuição interna da aplicação Java responsável por toda a lógica de negócio, fila de atendimentos, regras operacionais e persistência de dados.
+O diagrama da API de Serviços mostra a distribuição interna da aplicação responsável por toda a lógica de negócio, fila de atendimentos, regras operacionais e persistência de dados.
 
 A API está organizada em:
 
@@ -58,7 +58,7 @@ O Portal do Solicitante é acessado pelo público externo e permite:
 
 - Abertura de atendimentos  
 - Consulta de status e detalhes  
-- Autenticação via sistema corporativo  
+- Autenticação  
 
 A aplicação é organizada em:
 
@@ -94,3 +94,4 @@ Os principais módulos são:
 ![Diagrama de Componentes – Aplicação Backoffice](Trabalho%20Final/out/diagrama_components/diagrama_componentes3.png).
 
 ---
+
