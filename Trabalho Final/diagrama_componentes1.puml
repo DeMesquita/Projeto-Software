@@ -108,3 +108,4 @@ AtendimentoRepository   --> db
 UnidadeRepository       --> db
 
 @enduml
+
