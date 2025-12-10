@@ -5,13 +5,11 @@ title C4 - Nível de Componentes - API de Serviços Fale Conosco
 ' Usa a biblioteca C4 já embutida no PlantUML
 !include <C4/C4_Component.puml>
 
-' -------------------------------------------------------------------
-' Atores e sistemas externos (para manter coerência com o container)
-' -------------------------------------------------------------------
+' Pessoas
 Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
-Person(atendente,  "Atendente",  "Colaborador responsável por interagir e concluir os atendimentos.")
-Person(gestor,     "Gestor",     "Supervisor responsável pela unidade e desempenho.")
-Person(admin,      "Administrador", "Equipe técnica para gerenciamento global.")
+Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade e gestão da equipe.")
+Person(admin, "Administrador", "Equipe técnica para operação e manutenção do sistema.")
 
 System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.")
 
@@ -62,7 +60,7 @@ System_Boundary(faleconosco, "Sistema Fale Conosco") {
 Rel(solicitante, portal_solic, "Solicita e acompanha atendimentos", "Interface Web")
 Rel(atendente,  app_backoffice, "Realiza atendimentos", "Interface Web")
 Rel(gestor,     app_backoffice, "Configura unidades e visualiza estatísticas", "Interface Web")
-Rel(admin,      app_backoffice, "Gerencia configurações globais", "Interface Web")
+Rel(admin,      app_backoffice, "Realiza operação e manutenção técnica", "Interface Web")
 
 ' Portais chamando controllers da API
 Rel(portal_solic,   atendimentoController, "HTTP/JSON")

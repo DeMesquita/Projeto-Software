@@ -8,8 +8,8 @@ title C4 - Diagrama de Contêineres - Fale Conosco
 ' Pessoas
 Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
 Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
-Person(gestor, "Gestor", "Supervisor responsável pela unidade e desempenho.")
-Person(admin, "Administrador", "Equipe técnica para gerenciamento global.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade e gestão da equipe.")
+Person(admin, "Administrador", "Equipe técnica para operação e manutenção do sistema.")
 
 ' Sistema Externo
 System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que gerencia identidades e perfis dos usuários.") 
@@ -17,37 +17,35 @@ System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que ge
 
 System_Boundary(faleconosco, "Sistema Fale Conosco") {
 
-    ' Contêineres Frontend
-    ' Ambas as aplicações Web usam React
-    Container(portal_solic, "Portal do Solicitante", "Aplicação Web (React)", "Interface pública para iniciar/solicitar atendimentos.")
-    Container(app_backoffice, "Aplicação Backoffice", "Aplicação Web (React)", "Interface para Atendentes prestarem atendimento, além de Gestores e Administradores realizarem a gestão dos atendimentos e configurações da plataforma.")
+' Frontend
+Container(portal_solic, "Portal do Solicitante", "Aplicação Web", "Interface pública para iniciar/solicitar atendimentos.")
+ Container(app_backoffice, "Aplicação Backoffice", "Aplicação Web", "Interface para gestão de atendimentos e configurações.")
 
-    ' Contêiner Backend
-    ' A API usa Java
-    Container(api, "API de Serviços", "Serviço Web (Java)", "Expõe a lógica de negócio, gerencia filas e comunica com sistemas externos.")
-    
-    ' Contêiner de Dados (mantido)
-    ContainerDb(db, "Base de Dados", "PostgreSQL", "Armazena dados de atendimentos, usuários e configurações.")
+' Backend
+Container(api, "API de Serviços", "Serviço Web", "Expõe a lógica de negócio, gerencia filas e comunica com sistemas externos.")
+
+' Dados 
+ContainerDb(db, "Base de Dados", "Relacional", "Armazena dados de atendimentos, usuários e configurações.")
 }
 
 
 ' Relacionamentos Internos
 
-Rel(portal_solic, api, "Lê e Escreve Dados", "HTTPS/JSON")
-Rel(app_backoffice, api, "Lê e Escreve Dados", "HTTPS/JSON")
-Rel_U(api, db, "Lê e Escreve Dados", "JDBC")
+Rel(portal_solic, api, "Solicita Atendimento e Consulta Posição na Fila", "HTTPS/JSON")
+Rel(app_backoffice, api, "Controla Fila, Realiza Chat e Gerencia Configurações", "HTTPS/JSON")
+Rel_U(api, db, "Persiste Dados da Fila, Atendimentos e Configurações", "JDBC")
 
 
-' Relacionamentos com o Contexto
 
-' Usuários e Frontends
-Rel(solicitante, portal_solic, "Usa", "Interface Web")
-Rel(atendente, app_backoffice, "Usa", "Interface Web")
-Rel(gestor, app_backoffice, "Usa", "Interface Web")
-Rel(admin, app_backoffice, "Usa", "Interface Web")
+
+
+Rel(solicitante, portal_solic, "Usa para Iniciar Atendimento", "Interface Web")
+Rel(atendente, app_backoffice, "Usa para Atender e Gerenciar Status", "Interface Web")
+Rel(gestor, app_backoffice, "Usa para Monitorar Fila e Alocar Atendentes", "Interface Web")
+Rel(admin, app_backoffice, "Usa para Operação e Manutenção Técnica", "Interface Web")
 
 ' API e Sistema de Autenticação
-Rel_R(api, auth_system, "Autenticação e Consulta de Perfis", "HTTPS")
+Rel_R(api, auth_system, "Autentica e Consulta Perfis de Gestores/Atendentes/Admins", "HTTPS")
 
 
 SHOW_LEGEND()

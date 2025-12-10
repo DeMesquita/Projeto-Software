@@ -10,14 +10,14 @@ System_Ext(auth_system, "Sistema de Autenticação", "Sistema corporativo que ge
 ' Pessoas
 Person(solicitante, "Solicitante", "Usuário que busca e solicita um serviço ou atendimento.")
 Person(atendente, "Atendente", "Colaborador responsável por interagir e concluir os atendimentos.")
-Person(gestor, "Gestor", "Supervisor responsável pela unidade, configurações e desempenho da equipe.")
-Person(admin, "Administrador", "Equipe técnica responsável pela manutenção e gerenciamento global do sistema.")
+Person(gestor, "Gestor", "Supervisor responsável pela unidade e gestão da equipe.")
+Person(admin, "Administrador", "Equipe técnica para operação e manutenção do sistema.")
 
 ' Relacionamentos
 Rel(solicitante, faleconosco, "Solicita e Acompanha", "Interface Web")
 Rel(atendente, faleconosco, "Realiza Atendimentos e Controla fila de Atendimentos", "Interface Web")
 Rel(gestor, faleconosco, "Configura Unidades e Visualiza Estatísticas", "Interface Web")
-Rel(admin, faleconosco, "Gerencia Configurações Globais e Manutenção", "Interface Web")
+Rel(admin, faleconosco, "Usa para Operação e Manutenção Técnica", "Interface Web")
 
 ' Relacionamentos com Sistemas Externos
 Rel(faleconosco, auth_system, "Autenticação e consulta de perfis de usuário", "HTTPS") 
