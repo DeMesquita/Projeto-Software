@@ -13,7 +13,6 @@ O **Diagrama de Contexto** do sistema **Fale Conosco**.
     * **Gestores:** Configuram unidades de atendimento e visualizam estatísticas.
     * **Administradores:** Realizam operação e manutenção técnica.
 * **Sistemas Externos:** O sistema depende do **Sistema de Autenticação** corporativo, que gerencia as identidades e perfis dos usuários. A comunicação para autenticação é feita via **HTTPS**.
-Trabalho Final/out/diagrama_conteiner
 ![Diagrama de Contexto](Trabalho%20Final/out/diagrama_contexto/diagrama_contexto.png)
 
 
@@ -94,4 +93,5 @@ Os principais módulos são:
 ![Diagrama de Componentes – Aplicação Backoffice](Trabalho%20Final/out/diagrama_components/diagrama_componentes3.png).
 
 ---
+
 
