@@ -48,7 +48,7 @@ A API está organizada em:
 - **Repositórios** — Realizam a persistência dos dados no PostgreSQL.  
 - **Cliente de Autenticação** — Integra com o Sistema de Autenticação corporativo.
 
-![Diagrama de Componentes – API de Serviços](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes1.png)
+![Diagrama de Componentes – API de Serviços](Trabalho%20Final/out/diagrama_components/diagrama_componentes1.png)
 
 ---
 
@@ -67,7 +67,7 @@ A aplicação é organizada em:
 - **Cliente de API para comunicação com a API de Serviços**  
 - **Cliente de Autenticação via HTTPS**
 
-![Diagrama de Componentes – Portal do Solicitante](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes2.png)
+![Diagrama de Componentes – Portal do Solicitante](Trabalho%20Final/out/diagrama_components/diagrama_componentes2.png).
 
 ---
 
@@ -91,9 +91,6 @@ Os principais módulos são:
 - **Cliente de API Backoffice**  
 - **Cliente de Autenticação**
 
-![Diagrama de Componentes – Aplicação Backoffice](Trabalho%20Final/out/diagrama_componentes/diagrama_componentes3.png).
+![Diagrama de Componentes – Aplicação Backoffice](Trabalho%20Final/out/diagrama_components/diagrama_componentes3.png).
 
 ---
-
-
-
